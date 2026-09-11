@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calgary Water Quality & pH Monitor | SNKAA</title>
+    <meta name="description" content="Real-time water quality and pH monitoring for Calgary water supply, Bearspaw Reservoir, and Glenmore Reservoir.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #08090d;
+            --bg-card: rgba(18, 20, 29, 0.75);
+            --bg-card-hover: rgba(26, 30, 44, 0.85);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --border-card-hover: rgba(120, 119, 198, 0.4);
+            
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-cyan: #06b6d4;
+            
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            font-size: 28px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .brand p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-card);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        /* Stat Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 18px;
+            position: relative;
+            backdrop-filter: blur(12px);
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-val {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .card-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-amber {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-emerald {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* Chart section */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .section-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        /* Hot Tub Calculator */
+        .calc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            align-items: center;
+        }
+
+        .calc-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-group input, .form-group select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-card);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .calc-result {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .dose-number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-amber);
+            font-family: var(--font-mono);
+        }
+
+        /* Table */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-family: var(--font-mono);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-card);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="brand">
+                <div class="brand-icon">💧</div>
+                <div>
+                    <h1>Calgary Water Quality & pH</h1>
+                    <p>City of Calgary SODA Ingestion • Bearspaw & Glenmore Reservoirs</p>
+                </div>
+            </div>
+            <div class="nav-actions">
+                <a href="https://snkaa.ca" class="btn btn-outline">← SNKAA Portfolio</a>
+                <button id="refreshBtn" class="btn btn-primary" onclick="refreshData()">Sync Live SODA</button>
+            </div>
+        </header>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+            <div class="card">
+                <div class="card-label">
+                    <span>Bearspaw pH (Latest)</span>
+                    <span id="phBadge" class="badge badge-amber">Alkaline</span>
+                </div>
+                <div class="card-val" id="valBearspaw" style="color: #fbbf24;">8.21</div>
+                <div class="card-sub" id="subBearspaw">Bearspaw West Sonde Sensor</div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">
+                    <span>Hot Tub Sweet Spot</span>
+                    <span class="badge badge-emerald">Target</span>
+                </div>
+                <div class="card-val" style="color: #34d399;">7.50</div>
+                <div class="card-sub" id="subDelta">+0.71 pH units above target</div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">
+                    <span>Glenmore Reservoir</span>
+                    <span class="badge badge-amber">Grab</span>
+                </div>
+                <div class="card-val" id="valGlenmore" style="color: #38bdf8;">8.30</div>
+                <div class="card-sub" id="subGlenmore">Head Pond & Mid-Lake</div>
+            </div>
+
+            <div class="card">
+                <div class="card-label">
+                    <span>Annual Range</span>
+                    <span class="badge badge-emerald">Seasonal</span>
+                </div>
+                <div class="card-val" style="color: #c084fc;">8.10 – 8.45</div>
+                <div class="card-sub">Low: Jan (8.10) • Peak: Aug (8.45)</div>
+            </div>
+        </div>
+
+        <!-- SVG Timeline Chart -->
+        <div class="chart-card">
+            <h2 class="section-title">Historical pH Trend (14 Months)</h2>
+            <p class="section-desc">Monthly average pH across Calgary supply basins vs. hot tub target (7.50) and municipal guidelines (7.0 - 8.5).</p>
+            <div style="width: 100%; overflow-x: auto;">
+                <svg id="trendSvg" viewBox="0 0 900 240" style="width: 100%; min-width: 600px; height: auto;">
+                    <!-- SVG populated by JS -->
+                </svg>
+            </div>
+        </div>
+
+        <!-- Hot Tub Dosing Calculator -->
+        <div class="calc-card">
+            <h2 class="section-title">Hot Tub & Pool pH Decreaser Calculator</h2>
+            <p class="section-desc">Calculate the recommended sodium bisulfate (dry acid) dosage for freshly filled Calgary tap water.</p>
+            
+            <div class="calc-grid">
+                <div class="calc-form">
+                    <div class="form-group">
+                        <label>Tub / Pool Volume</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="number" id="volumeInput" value="1500" step="50" style="flex: 1;" oninput="calcDose()">
+                            <select id="unitSelect" onchange="calcDose()" style="width: 110px;">
+                                <option value="L">Liters (L)</option>
+                                <option value="gal">Gallons (US)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Current Water pH (from Bearspaw)</label>
+                        <input type="number" id="currentPhInput" value="8.21" step="0.05" oninput="calcDose()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Target pH</label>
+                        <input type="number" id="targetPhInput" value="7.50" step="0.05" oninput="calcDose()">
+                    </div>
+                </div>
+
+                <div class="calc-result">
+                    <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Recommended Sodium Bisulfate (Dry Acid)</div>
+                    <div class="dose-number" id="dryAcidDose">32 g</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px;" id="doseExplain">
+                        Approx. <strong>2 level tablespoons</strong>. Dissolve in a bucket of spa water with jets running, circulate for 30 minutes, then re-test.
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+                        *Note: Calgary tap water typically carries high Total Alkalinity (120–160 ppm CaCO3), which acts as a chemical buffer against rapid pH drops.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Breakdown Table -->
+        <div class="table-card">
+            <h2 class="section-title">Monthly Water Quality Summary</h2>
+            <p class="section-desc">Aggregated statistics from all discrete and automated sampling sites.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Average pH</th>
+                        <th>Min pH</th>
+                        <th>Max pH</th>
+                        <th>Sample Count</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div>
+                © 2026 Neal Alexander • SNKAA Labs • Calgary Water Intelligence
+            </div>
+            <div>
+                Data Source: <a href="https://data.calgary.ca" target="_blank">City of Calgary Open Data API (SODA)</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let currentStats = null;
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                currentStats = data;
+                renderDashboard(data);
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+
+        async function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.textContent = 'Syncing...';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/refresh', { method: 'POST' });
+                const result = await res.json();
+                await loadStats();
+                btn.textContent = 'Synced (' + result.records_synced + ')';
+            } catch (e) {
+                btn.textContent = 'Sync Failed';
+            }
+            setTimeout(() => {
+                btn.textContent = 'Sync Live SODA';
+                btn.disabled = false;
+            }, 3000);
+        }
+
+        function renderDashboard(data) {
+            if (data.latest_bearspaw) {
+                document.getElementById('valBearspaw').textContent = data.latest_bearspaw.numeric_result.toFixed(2);
+                document.getElementById('subBearspaw').textContent = `${data.latest_bearspaw.sample_site} • ${data.latest_bearspaw.sample_date.slice(0, 10)}`;
+                document.getElementById('currentPhInput').value = data.latest_bearspaw.numeric_result.toFixed(2);
+            }
+
+            if (data.latest_glenmore) {
+                document.getElementById('valGlenmore').textContent = data.latest_glenmore.numeric_result.toFixed(2);
+                document.getElementById('subGlenmore').textContent = `${data.latest_glenmore.sample_site} • ${data.latest_glenmore.sample_date.slice(0, 10)}`;
+            }
+
+            document.getElementById('subDelta').textContent = `+${data.delta.toFixed(2)} pH units above 7.50 target`;
+
+            const badge = document.getElementById('phBadge');
+            badge.textContent = data.status;
+            if (data.status === 'Optimal') {
+                badge.className = 'badge badge-emerald';
+            } else {
+                badge.className = 'badge badge-amber';
+            }
+
+            renderChart(data.monthly);
+            renderTable(data.monthly);
+            calcDose();
+        }
+
+        function renderChart(monthly) {
+            if (!monthly || monthly.length === 0) return;
+            const svg = document.getElementById('trendSvg');
+            const w = 900, h = 240;
+            const padL = 60, padR = 40, padT = 30, padB = 40;
+            const plotW = w - padL - padR;
+            const plotH = h - padT - padB;
+
+            // pH scale: 7.0 to 8.6
+            const minPh = 7.0, maxPh = 8.6;
+            const getY = ph => padT + (1 - (ph - minPh) / (maxPh - minPh)) * plotH;
+            const getX = i => padL + (i / (monthly.length - 1)) * plotW;
+
+            let markup = '';
+
+            // Optimal Hot Tub target band (7.2 - 7.6)
+            const y76 = getY(7.6);
+            const y72 = getY(7.2);
+            markup += `<rect x="${padL}" y="${y76}" width="${plotW}" height="${y72 - y76}" fill="rgba(16, 185, 129, 0.08)" rx="4"/>`;
+
+            // Grid lines
+            [7.0, 7.5, 8.0, 8.5].forEach(ph => {
+                const y = getY(ph);
+                const isTarget = ph === 7.5;
+                const stroke = isTarget ? '#10b981' : 'rgba(255, 255, 255, 0.08)';
+                const dash = isTarget ? 'stroke-dasharray="4,4" stroke-width="1.5"' : 'stroke-width="0.8"';
+                markup += `<line x1="${padL}" y1="${y}" x2="${w - padR}" y2="${y}" stroke="${stroke}" ${dash}/>`;
+                markup += `<text x="${padL - 10}" y="${y + 4}" fill="${isTarget ? '#10b981' : '#6b7280'}" font-size="11" text-anchor="end" font-family="var(--font-mono)">${ph.toFixed(1)}</text>`;
+            });
+
+            // Target annotation
+            markup += `<text x="${w - padR - 10}" y="${getY(7.5) - 6}" fill="#10b981" font-size="10" text-anchor="end" font-weight="600">Hot Tub Sweet Spot (7.5)</text>`;
+
+            // Trend Points
+            const pts = monthly.map((m, i) => `${getX(i)},${getY(m.avg_ph)}`).join(' ');
+            const areaPts = `${padL},${getY(7.0)} ${pts} ${getX(monthly.length - 1)},${getY(7.0)}`;
+
+            markup += `<polygon points="${areaPts}" fill="rgba(59, 130, 246, 0.08)"/>`;
+            markup += `<polyline points="${pts}" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round"/>`;
+
+            // Draw monthly circles & labels
+            monthly.forEach((m, i) => {
+                const x = getX(i);
+                const y = getY(m.avg_ph);
+                const isLatest = i === monthly.length - 1;
+                markup += `<circle cx="${x}" cy="${y}" r="${isLatest ? 6 : 4}" fill="${isLatest ? '#fbbf24' : '#3b82f6'}" stroke="#08090d" stroke-width="2"/>`;
+                if (isLatest) {
+                    markup += `<circle cx="${x}" cy="${y}" r="9" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="2,2"/>`;
+                    markup += `<text x="${x}" y="${y - 12}" fill="#fbbf24" font-size="11" font-weight="700" text-anchor="middle" font-family="var(--font-mono)">${m.avg_ph.toFixed(2)}</text>`;
+                }
+                markup += `<text x="${x}" y="${h - padB + 20}" fill="#9ca3af" font-size="10" text-anchor="middle" font-family="var(--font-mono)">${m.month.slice(2)}</text>`;
+            });
+
+            svg.innerHTML = markup;
+        }
+
+        function renderTable(monthly) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            [...monthly].reverse().forEach(m => {
+                const status = m.avg_ph >= 8.3 ? 'High' : (m.avg_ph >= 8.2 ? 'Moderate' : 'Good');
+                const badgeClass = status === 'High' ? 'badge-amber' : (status === 'Moderate' ? 'badge-amber' : 'badge-emerald');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${m.month}</strong></td>
+                    <td style="color: #38bdf8;">${m.avg_ph.toFixed(2)}</td>
+                    <td style="color: #9ca3af;">${m.min_ph.toFixed(2)}</td>
+                    <td style="color: #fbbf24;">${m.max_ph.toFixed(2)}</td>
+                    <td style="color: #6b7280;">${m.sample_count}</td>
+                    <td><span class="badge ${badgeClass}">${status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function calcDose() {
+            let vol = parseFloat(document.getElementById('volumeInput').value) || 1500;
+            const unit = document.getElementById('unitSelect').value;
+            const currentPh = parseFloat(document.getElementById('currentPhInput').value) || 8.21;
+            const targetPh = parseFloat(document.getElementById('targetPhInput').value) || 7.50;
+
+            // Convert to Liters
+            const volL = unit === 'gal' ? vol * 3.78541 : vol;
+
+            const delta = currentPh - targetPh;
+            if (delta <= 0) {
+                document.getElementById('dryAcidDose').textContent = '0 g';
+                document.getElementById('doseExplain').innerHTML = 'Current pH is already at or below your target. No decreaser needed!';
+                return;
+            }
+
+            // Standard chemical dosing formula for Sodium Bisulfate:
+            // ~10 grams per 1,000 L to lower pH by approx 0.2 units (assuming typical Calgary Total Alkalinity of ~140 ppm)
+            // Dose (g) = (delta / 0.2) * (volL / 1000) * 10 = delta * volL * 0.05
+            const doseGrams = Math.round(delta * volL * 0.045);
+            const tbsp = (doseGrams / 15).toFixed(1);
+            const ounces = (doseGrams * 0.035274).toFixed(1);
+
+            document.getElementById('dryAcidDose').textContent = `${doseGrams} g`;
+            document.getElementById('doseExplain').innerHTML = 
+                `Approx. <strong>${tbsp} level tablespoons</strong> (${ounces} oz). Pre-dissolve in warm water, pour into hot tub with pumps running, and circulate for 30 minutes before re-testing.`;
+        }
+
+        // Initialize on load
+        loadStats();
+    </script>
+</body>
+</html>
